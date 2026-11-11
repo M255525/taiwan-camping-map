@@ -1,0 +1,31 @@
+{
+  "name": "台灣露營地圖",
+  "short_name": "露營地圖",
+  "description": "3D 台灣露營地圖：選月份看哪裡露營最舒服，14 個營地的露營指數、夜間低溫、天氣提醒與裝備建議。",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#e8dcc2",
+  "theme_color": "#5b3a1f",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

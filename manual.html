@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>台灣露營地圖・操作手冊</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--ink:#2e2418;--ink2:#5a4a38;--paper:#f8f1e3;--bg:#e8dcc2;--line:#d9c6a3;--wood:#6b4423;--forest:#2f5d3a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;--ink:#f3e9d8;--ink2:#d7c7ad;--paper:#2a2219;--bg:#1c160f;--line:#5a4834}}
+:root[data-theme="dark"]{color-scheme:dark;--ink:#f3e9d8;--ink2:#d7c7ad;--paper:#2a2219;--bg:#1c160f;--line:#5a4834}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans TC',sans-serif;line-height:1.8}
+main{max-width:900px;margin:0 auto;padding:24px 16px 48px}
+h1{font-size:30px;margin:0 0 4px;font-weight:900;color:var(--wood)}
+h2{font-size:21px;margin:28px 0 8px;border-left:6px solid var(--forest);padding-left:10px;font-weight:900}
+section{background:var(--paper);border:2px solid var(--line);border-radius:12px;padding:6px 18px 14px;margin-top:14px}
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+td,th{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;vertical-align:top}
+td.sc{text-align:center;color:#fff;font-weight:700;border:1px solid var(--paper)}
+.k{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;border:1px solid rgba(0,0,0,.2)}
+a{color:#2a6f8f;word-break:break-all}
+p,li{color:var(--ink2)}
+</style>
+</head>
+<body>
+<main>
+<h1>台灣露營地圖・操作手冊</h1>
+<p><a href="index.html">← 回到 3D 露營地圖</a></p>
+
+<section>
+<h2>這是什麼</h2>
+<p>一張 3D 台灣露營地圖，回答「這個月去哪裡露營最舒服」：選一個月份，每個營地會依海拔與各地月平均氣溫估算夜晚低溫、白天高溫，再扣掉東北季風、梅雨、颱風、午後雷陣雨等季節因素，算出 1～5 的露營指數，並建議睡袋溫度與要帶的裝備。地圖上可以打開「夜溫圖層」看全台估算的夜間低溫分布，也可以切到夜晚，看星空、帳篷燈與營火，螢火蟲季的營地會有螢火蟲飛舞。收錄 14 個營地，以公營或在官方資料中查得到的營地為主。</p>
+</section>
+
+<section>
+<h2>基本操作</h2>
+<ol>
+<li><b>選月份</b>：點下方的月份長條，長條高度＝那個月露營指數 4 以上（適合／很適合）的營地數。按 ▶ 自動播放一整年，「本月」跳回這個月；鍵盤 ← → 換月份、N 切換日夜。</li>
+<li><b>看地圖</b>：細線是等高線（每 250 公尺一條、每 1,000 公尺加粗）。「🌡 夜溫圖層」打開時，陸地顏色是估算的夜間低溫：藍紫色很冷、綠色最舒服、黃到橘紅色悶熱。營地木牌前的小圓點是當月露營指數的顏色。「🌙 夜晚」切到夜景。</li>
+<li><b>營地清單</b>：右側（手機在下方，按「展開清單」）依當月指數排序，分成「很適合／可以但看天氣／要注意」。點營地會飛過去，顯示夜晚與白天的估計溫度、建議睡袋舒適溫度、當月天氣提醒、全年 12 個月的指數色條（點色條可以換月份）、當月亮點、建議裝備、注意事項與管理單位、營位、預約方式。</li>
+<li><b>⚙ 常用設定</b>（收合式）：開啟時的月份、日夜、夜溫圖層、營地標籤、動畫、自動播放速度、介面配色；底部「關於本工具」集中操作手冊、使用警語、創作者資訊、加入主畫面與訪客數。</li>
+</ol>
+</section>
+
+<section>
+<h2>露營指數怎麼算</h2>
+<ul>
+<li><b>氣溫</b>：先用 8 個參考站（台北、宜蘭、台中、高雄、花蓮、台東、澎湖、金門）的月平均氣溫概略值，依距離加權推出營地所在位置的海平面月均溫，再依海拔每 100 公尺降 0.55°C。夜晚低溫＝月均溫減 4°C（海拔 800 公尺以上減 4.5°C），白天高溫＝月均溫加同樣的數字。</li>
+<li><b>夜溫分數</b>：夜晚 8～22°C 最舒服（5 分）；4～8°C 或 22～24.5°C 為 3.5 分；0～4°C 或更熱為 2 分；0°C 以下 1 分。白天 32°C 以上再扣 0.5。</li>
+<li><b>天氣扣分</b>：東北季風（北部、宜蘭迎風面）或離島季風強風扣 2、梅雨扣 1、颱風季扣 1、午後雷陣雨扣 0.5；恆春半島 10～3 月的落山風另扣 1。最後四捨五入成 1～5。</li>
+<li>這是一般氣候特徵的估算，不是預報；同一個月也可能遇到寒流、熱浪或颱風，出發前請查最新天氣。</li>
+</ul>
+<table>
+<tr><th>指數</th><th>意思</th></tr>
+<tr><td><span class="k" style="background:#2e7d4f"></span> 5　很適合</td><td>氣溫舒服、天氣穩定，最佳露營月份。</td></tr>
+<tr><td><span class="k" style="background:#7cb342"></span> 4　適合</td><td>大部分人都能舒服露營。</td></tr>
+<tr><td><span class="k" style="background:#d8b93a"></span> 3　普通</td><td>條件普通，看當週天氣再決定。</td></tr>
+<tr><td><span class="k" style="background:#d9822b"></span> 2　要注意</td><td>可以露營，但要針對寒冷、炎熱或天氣做好準備。</td></tr>
+<tr><td><span class="k" style="background:#7a6a8f"></span> 1　不建議</td><td>溫度或天氣條件差，除非經驗豐富、裝備齊全，否則換個月份。</td></tr>
+</table>
+</section>
+
+<section>
+<h2>全年露營指數總表</h2>
+<p>格子裡的數字是估算的夜晚低溫（°C），顏色是露營指數。</p>
+<div class="tw"><table>
+<tr><th>營地</th><th>1月</th><th>2月</th><th>3月</th><th>4月</th><th>5月</th><th>6月</th><th>7月</th><th>8月</th><th>9月</th><th>10月</th><th>11月</th><th>12月</th></tr>
+<tr><td>龍門露營渡假基地</td><td class="sc" style="background:#d8b93a" title="普通">12</td><td class="sc" style="background:#d8b93a" title="普通">13</td><td class="sc" style="background:#d8b93a" title="普通">14</td><td class="sc" style="background:#2e7d4f" title="很適合">17</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#d8b93a" title="普通">23</td><td class="sc" style="background:#7a6a8f" title="不建議">25</td><td class="sc" style="background:#7a6a8f" title="不建議">25</td><td class="sc" style="background:#d8b93a" title="普通">23</td><td class="sc" style="background:#d8b93a" title="普通">20</td><td class="sc" style="background:#d8b93a" title="普通">17</td><td class="sc" style="background:#d8b93a" title="普通">14</td></tr>
+<tr><td>武荖坑風景區露營場</td><td class="sc" style="background:#d8b93a" title="普通">12</td><td class="sc" style="background:#d8b93a" title="普通">12</td><td class="sc" style="background:#d8b93a" title="普通">14</td><td class="sc" style="background:#2e7d4f" title="很適合">17</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#d8b93a" title="普通">22</td><td class="sc" style="background:#d9822b" title="要注意">24</td><td class="sc" style="background:#d9822b" title="要注意">24</td><td class="sc" style="background:#d8b93a" title="普通">22</td><td class="sc" style="background:#d8b93a" title="普通">19</td><td class="sc" style="background:#d8b93a" title="普通">16</td><td class="sc" style="background:#d8b93a" title="普通">13</td></tr>
+<tr><td>石門營地</td><td class="sc" style="background:#d8b93a" title="普通">11</td><td class="sc" style="background:#d8b93a" title="普通">12</td><td class="sc" style="background:#d8b93a" title="普通">13</td><td class="sc" style="background:#2e7d4f" title="很適合">17</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#d8b93a" title="普通">22</td><td class="sc" style="background:#d9822b" title="要注意">24</td><td class="sc" style="background:#d9822b" title="要注意">24</td><td class="sc" style="background:#d8b93a" title="普通">22</td><td class="sc" style="background:#d8b93a" title="普通">19</td><td class="sc" style="background:#d8b93a" title="普通">16</td><td class="sc" style="background:#d8b93a" title="普通">13</td></tr>
+<tr><td>武陵農場露營區</td><td class="sc" style="background:#d9822b" title="要注意">3</td><td class="sc" style="background:#d9822b" title="要注意">3</td><td class="sc" style="background:#7cb342" title="適合">5</td><td class="sc" style="background:#2e7d4f" title="很適合">8</td><td class="sc" style="background:#7cb342" title="適合">11</td><td class="sc" style="background:#7cb342" title="適合">13</td><td class="sc" style="background:#7cb342" title="適合">15</td><td class="sc" style="background:#7cb342" title="適合">14</td><td class="sc" style="background:#7cb342" title="適合">13</td><td class="sc" style="background:#2e7d4f" title="很適合">10</td><td class="sc" style="background:#7cb342" title="適合">8</td><td class="sc" style="background:#7cb342" title="適合">4</td></tr>
+<tr><td>福壽山農場露營區</td><td class="sc" style="background:#7a6a8f" title="不建議">-1</td><td class="sc" style="background:#7a6a8f" title="不建議">-1</td><td class="sc" style="background:#d9822b" title="要注意">1</td><td class="sc" style="background:#7cb342" title="適合">4</td><td class="sc" style="background:#d8b93a" title="普通">7</td><td class="sc" style="background:#7cb342" title="適合">9</td><td class="sc" style="background:#7cb342" title="適合">10</td><td class="sc" style="background:#7cb342" title="適合">10</td><td class="sc" style="background:#7cb342" title="適合">9</td><td class="sc" style="background:#7cb342" title="適合">6</td><td class="sc" style="background:#d9822b" title="要注意">3</td><td class="sc" style="background:#d9822b" title="要注意">0</td></tr>
+<tr><td>東勢林場露營區</td><td class="sc" style="background:#2e7d4f" title="很適合">9</td><td class="sc" style="background:#2e7d4f" title="很適合">10</td><td class="sc" style="background:#2e7d4f" title="很適合">13</td><td class="sc" style="background:#2e7d4f" title="很適合">16</td><td class="sc" style="background:#7cb342" title="適合">19</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#7cb342" title="適合">21</td><td class="sc" style="background:#7cb342" title="適合">21</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#2e7d4f" title="很適合">18</td><td class="sc" style="background:#2e7d4f" title="很適合">15</td><td class="sc" style="background:#2e7d4f" title="很適合">11</td></tr>
+<tr><td>頭社水庫露營區</td><td class="sc" style="background:#2e7d4f" title="很適合">9</td><td class="sc" style="background:#2e7d4f" title="很適合">10</td><td class="sc" style="background:#2e7d4f" title="很適合">12</td><td class="sc" style="background:#2e7d4f" title="很適合">16</td><td class="sc" style="background:#7cb342" title="適合">19</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#7cb342" title="適合">21</td><td class="sc" style="background:#7cb342" title="適合">21</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#2e7d4f" title="很適合">18</td><td class="sc" style="background:#2e7d4f" title="很適合">15</td><td class="sc" style="background:#2e7d4f" title="很適合">11</td></tr>
+<tr><td>走馬瀨農場露營區</td><td class="sc" style="background:#2e7d4f" title="很適合">14</td><td class="sc" style="background:#2e7d4f" title="很適合">15</td><td class="sc" style="background:#2e7d4f" title="很適合">17</td><td class="sc" style="background:#2e7d4f" title="很適合">20</td><td class="sc" style="background:#d8b93a" title="普通">23</td><td class="sc" style="background:#d9822b" title="要注意">24</td><td class="sc" style="background:#7a6a8f" title="不建議">25</td><td class="sc" style="background:#d9822b" title="要注意">24</td><td class="sc" style="background:#d8b93a" title="普通">24</td><td class="sc" style="background:#7cb342" title="適合">22</td><td class="sc" style="background:#2e7d4f" title="很適合">20</td><td class="sc" style="background:#2e7d4f" title="很適合">16</td></tr>
+<tr><td>墾丁貓鼻頭露營（國家公園內）</td><td class="sc" style="background:#7cb342" title="適合">15</td><td class="sc" style="background:#7cb342" title="適合">16</td><td class="sc" style="background:#7cb342" title="適合">18</td><td class="sc" style="background:#2e7d4f" title="很適合">21</td><td class="sc" style="background:#d8b93a" title="普通">23</td><td class="sc" style="background:#d9822b" title="要注意">24</td><td class="sc" style="background:#7a6a8f" title="不建議">25</td><td class="sc" style="background:#7a6a8f" title="不建議">25</td><td class="sc" style="background:#d9822b" title="要注意">24</td><td class="sc" style="background:#d8b93a" title="普通">22</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#7cb342" title="適合">17</td></tr>
+<tr><td>鯉魚潭露營區</td><td class="sc" style="background:#2e7d4f" title="很適合">13</td><td class="sc" style="background:#2e7d4f" title="很適合">14</td><td class="sc" style="background:#2e7d4f" title="很適合">15</td><td class="sc" style="background:#2e7d4f" title="很適合">18</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#d8b93a" title="普通">22</td><td class="sc" style="background:#d8b93a" title="普通">24</td><td class="sc" style="background:#d8b93a" title="普通">24</td><td class="sc" style="background:#d8b93a" title="普通">22</td><td class="sc" style="background:#d9822b" title="要注意">20</td><td class="sc" style="background:#d8b93a" title="普通">17</td><td class="sc" style="background:#2e7d4f" title="很適合">15</td></tr>
+<tr><td>鹿野高台露營區</td><td class="sc" style="background:#2e7d4f" title="很適合">13</td><td class="sc" style="background:#2e7d4f" title="很適合">14</td><td class="sc" style="background:#2e7d4f" title="很適合">16</td><td class="sc" style="background:#2e7d4f" title="很適合">18</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#7cb342" title="適合">22</td><td class="sc" style="background:#d8b93a" title="普通">23</td><td class="sc" style="background:#d8b93a" title="普通">23</td><td class="sc" style="background:#7cb342" title="適合">22</td><td class="sc" style="background:#d9822b" title="要注意">20</td><td class="sc" style="background:#d8b93a" title="普通">17</td><td class="sc" style="background:#2e7d4f" title="很適合">14</td></tr>
+<tr><td>小野柳露營區</td><td class="sc" style="background:#2e7d4f" title="很適合">15</td><td class="sc" style="background:#2e7d4f" title="很適合">16</td><td class="sc" style="background:#2e7d4f" title="很適合">18</td><td class="sc" style="background:#2e7d4f" title="很適合">20</td><td class="sc" style="background:#d8b93a" title="普通">22</td><td class="sc" style="background:#d8b93a" title="普通">24</td><td class="sc" style="background:#7a6a8f" title="不建議">25</td><td class="sc" style="background:#d9822b" title="要注意">24</td><td class="sc" style="background:#d8b93a" title="普通">23</td><td class="sc" style="background:#d9822b" title="要注意">22</td><td class="sc" style="background:#d8b93a" title="普通">19</td><td class="sc" style="background:#2e7d4f" title="很適合">16</td></tr>
+<tr><td>湖西苗圃童軍露營地</td><td class="sc" style="background:#d8b93a" title="普通">13</td><td class="sc" style="background:#d8b93a" title="普通">13</td><td class="sc" style="background:#d8b93a" title="普通">15</td><td class="sc" style="background:#2e7d4f" title="很適合">18</td><td class="sc" style="background:#7cb342" title="適合">21</td><td class="sc" style="background:#d8b93a" title="普通">24</td><td class="sc" style="background:#7a6a8f" title="不建議">25</td><td class="sc" style="background:#d9822b" title="要注意">24</td><td class="sc" style="background:#d8b93a" title="普通">24</td><td class="sc" style="background:#d8b93a" title="普通">21</td><td class="sc" style="background:#d8b93a" title="普通">18</td><td class="sc" style="background:#d8b93a" title="普通">15</td></tr>
+<tr><td>金門后湖海濱公園</td><td class="sc" style="background:#d8b93a" title="普通">9</td><td class="sc" style="background:#d8b93a" title="普通">10</td><td class="sc" style="background:#d8b93a" title="普通">12</td><td class="sc" style="background:#2e7d4f" title="很適合">16</td><td class="sc" style="background:#7cb342" title="適合">20</td><td class="sc" style="background:#d8b93a" title="普通">23</td><td class="sc" style="background:#7a6a8f" title="不建議">25</td><td class="sc" style="background:#7a6a8f" title="不建議">25</td><td class="sc" style="background:#d8b93a" title="普通">23</td><td class="sc" style="background:#d8b93a" title="普通">20</td><td class="sc" style="background:#d8b93a" title="普通">16</td><td class="sc" style="background:#d8b93a" title="普通">11</td></tr>
+</table></div>
+</section>
+
+<section>
+<h2>收錄營地</h2>
+<ul><li>北部・宜蘭：龍門露營渡假基地（新北市貢寮區，海拔約 10 公尺）、武荖坑風景區露營場（宜蘭縣蘇澳鎮，海拔約 60 公尺）、石門營地（桃園市龍潭區，海拔約 200 公尺）</li><li>中部：武陵農場露營區（台中市和平區，海拔約 1,750 公尺）、福壽山農場露營區（台中市和平區，海拔約 2,574 公尺）、東勢林場露營區（台中市東勢區，海拔約 600 公尺）、頭社水庫露營區（南投縣魚池鄉，海拔約 650 公尺）</li><li>南部：走馬瀨農場露營區（台南市大內區，海拔約 70 公尺）、墾丁貓鼻頭露營（國家公園內）（屏東縣恆春鎮，海拔約 20 公尺）</li><li>花東：鯉魚潭露營區（花蓮縣壽豐鄉，海拔約 130 公尺）、鹿野高台露營區（台東縣鹿野鄉，海拔約 350 公尺）、小野柳露營區（台東縣台東市，海拔約 10 公尺）</li><li>離島：湖西苗圃童軍露營地（澎湖縣湖西鄉，海拔約 20 公尺）、金門后湖海濱公園（金門縣金城鎮，海拔約 5 公尺）</li></ul>
+<p>營地的營位、收費、開放時間、預約方式與用火規定經常變動，部分營地可能停業、整修或改由其他單位經營，一律以官方公告為準；可以到<a href="https://camp.tad.gov.tw/" target="_blank" rel="noopener">交通部觀光署露營場資訊平台</a>查詢是否為合法登記的營地。</p>
+</section>
+
+<section>
+<h2>露營須知（重點）</h2>
+<ul>
+<li>無痕山林：帶上山的東西全部帶下山，只在指定營位紮營，洗碗水不倒進溪流。</li>
+<li>用火依營地規定，很多營地禁止生柴；帳篷內不要用瓦斯爐或炭火取暖。</li>
+<li>颱風、豪雨、低溫特報就取消；山區午後雷陣雨多，不要在溪床紮營。</li>
+<li>晚上 10 點後降低音量；賞螢、看星星用紅光，不要用強光直照。</li>
+</ul>
+<p>完整內容、天氣標記與「露營小辭典」請按地圖上的「⛺ 露營須知」。</p>
+</section>
+
+<section>
+<h2>注意事項</h2>
+<ul>
+<li>氣溫、夜溫圖層與露營指數都是依月平均氣溫概略值估算的一般參考，不是天氣預報；高海拔地區實際溫差可能更大。</li>
+<li>海岸線、山的高度與營地位置都經過簡化與誇大，距離很近的營地會分開排列，不可用於導航或登山。</li>
+<li>本工具為個人製作的教學工具，與各營地、農場、國家公園、風景區管理處及縣市政府無關，也不代表推薦或背書。</li>
+<li>3D 地圖需要網路下載繪圖元件。你看的月份、營地與常用設定只記在這台裝置的瀏覽器，不會上傳。</li>
+<li>本工具的文字說明、介面與 3D 模型僅供教學、課程及個人使用，禁止未經授權公開發布、販售或商業化使用。</li>
+</ul>
+</section>
+
+<section id="sources">
+<h2>資料來源</h2>
+<ul>
+<li>營地資訊：各營地或主管單位官網（例如<a href="https://camping.wuling-farm.com.tw/camp/" target="_blank" rel="noopener">武陵農場露營區訂位系統</a>、<a href="https://www.fushoushan.com.tw/Outer/CamInfo" target="_blank" rel="noopener">福壽山農場露營區簡介</a>、<a href="https://www.tsfa.com.tw/page/about/index.aspx?kind=53" target="_blank" rel="noopener">東勢林場露營區</a>、<a href="https://www.taiwan.net.tw/m1.aspx?sNo=0001016&amp;id=709" target="_blank" rel="noopener">觀光署：龍門露營區</a>、<a href="https://www.taiwan.net.tw/m1.aspx?sNo=0001016&amp;id=3516" target="_blank" rel="noopener">觀光署：武荖坑風景區</a>）、<a href="https://camp.tad.gov.tw/" target="_blank" rel="noopener">交通部觀光署露營場資訊平台</a>與公開報導，2026-11 整理。</li>
+<li>氣溫：參考中央氣象署各測站月平均氣溫，簡化為概略值；季風、梅雨、颱風、午後雷陣雨月份為一般氣候特徵。</li>
+<li>台灣與離島輪廓、山脈地形：沿用作者「台灣賞鳥地圖」的手描簡化圖，山高有誇大。</li>
+<li>營地與須知的文字說明皆為自行撰寫。</li>
+</ul>
+</section>
+
+<section id="creator">
+<h2>創作者</h2>
+<div class="mk-creator">
+<style>.mk-creator{line-height:1.75}.mk-creator h3{margin:14px 0 6px;font-size:1.05em}.mk-creator table{width:100%;border-collapse:collapse;font-size:.95em}.mk-creator td,.mk-creator th{text-align:left;padding:5px 6px;border-bottom:1px solid rgba(128,128,128,.3);vertical-align:top}.mk-creator th{white-space:nowrap}.mk-creator ul{margin:4px 0;padding-left:1.4em}.mk-creator .mk-tags{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}.mk-creator .mk-tags span{border:1px solid rgba(128,128,128,.45);border-radius:999px;padding:1px 10px;font-size:.9em}</style>
+<p><b>Mark Tsai（蔡豐全）</b>為深耕創業輔導與數位轉型領域的顧問與講師，長期擔任勞動力發展署創業顧問與多項政府計畫的顧問、業師與評審委員，協助中小企業導入數據分析與 AI 工具、申請政府補助計畫，並具備跨境電商實務與講師培訓的豐富經驗。本工具是其推廣 AI 工具運用於教學與課程情境的作品之一。</p>
+<p>聯絡信箱：<a href="mailto:tsaimark@gmail.com">tsaimark@gmail.com</a></p>
+<h3>專長</h3>
+<div class="mk-tags"><span>銷售數據分析</span><span>AI 工具運用</span><span>政府補助計畫申請</span><span>創業</span><span>跨境電商</span></div>
+<h3>證照</h3>
+<table>
+<thead><tr><th>年度</th><th>證照</th></tr></thead>
+<tbody>
+<tr><td>2013</td><td>青創總會 創業輔導顧問師班</td></tr>
+<tr><td>2014</td><td>青創總會 網路行銷講師培訓班</td></tr>
+<tr><td>2016</td><td>阿里巴巴 P4P 認證講師</td></tr>
+<tr><td>2017</td><td>iCap 訓練規劃與評量職能基準課程</td></tr>
+<tr><td>2023</td><td>iCap 職能導向課程申請認證實作班</td></tr>
+<tr><td>2025</td><td>iPAS AI 應用規劃師－初級</td></tr>
+<tr><td>2025</td><td>新北市社會局 社區數位陪伴員</td></tr>
+</tbody>
+</table>
+<h3>經歷</h3>
+<ul>
+<li>勞動力發展署桃竹苗分署 創業顧問（2017－迄今）</li>
+<li>勞動力發展署（北北基）小型企業人力提升計畫 顧問（2019－迄今）</li>
+<li>勞動力發展署（桃竹苗）小型企業人力提升計畫 顧問（2019－迄今）</li>
+<li>農業部農業科技司「科技農企業雙軸轉型躍升發展」科技計畫 業師（2025－2026）</li>
+<li>勞動力發展署 企業人力資源提升計畫 審查委員（2024）</li>
+<li>勞動力發展署 職前訓練評鑑計畫 委員（2022）</li>
+<li>勞動部桃竹苗分署 桃竹苗區域運籌人力資源整合服務計畫 顧問（2022－2023）</li>
+<li>經濟部中小企業處 SBIR 海選專案 評審委員（2019－2024）</li>
+<li>勞動力發展署 數位學習課程清單審查會議 審查委員（2024－2025）</li>
+<li>輔仁大學創新跨領域學院 課務委員（2024－2025）</li>
+<li>台北市進出口商業同業公會 跨境電商生態村 顧問</li>
+<li>台灣網商協會 顧問</li>
+<li>中華職能開發策進會 顧問（2018－2020）</li>
+<li>新北市汽車美容人員職業工會 顧問（2023－迄今）</li>
+<li>中華網路行銷講師協會 顧問（2022－迄今）</li>
+<li>新北市社企電商基地 輔導顧問（2018－2020）</li>
+<li>阿里巴巴國際站平台 認證講師（2016）</li>
+<li>巨匠電腦 跨境電子商務班 講師（2016－2017）</li>
+</ul>
+</div>
+</section>
+</main>
+</body>
+</html>

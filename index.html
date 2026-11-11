@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>台灣露營地圖</title>
+<meta name="description" content="3D 台灣露營地圖：選月份看哪裡露營最舒服——14 個營地的露營指數、夜間低溫、季風梅雨颱風提醒、建議睡袋與裝備，夜晚模式看星空、營火與螢火蟲。">
+<meta name="theme-color" content="#5b3a1f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="露營地圖">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
+</script>
+<style>
+:root{
+  --ink:#2e2418; --ink2:#5a4a38; --mute:#8a7a66; --paper:#f8f1e3; --paper2:#efe3cc; --line:#d9c6a3; --edge:#4a3220;
+  --wood:#6b4423; --wood2:#8a5a30; --forest:#2f5d3a; --ember:#e0662b; --sea:#2a6f8f; --cream:#fbf3df;
+  --shadow:0 8px 22px rgba(60,35,15,.22); --mq:0px; --r:12px;
+  --font:'Noto Sans TC',system-ui,sans-serif;
+  --sky1:#aacde8; --sky2:#ece4d0;
+  --topo:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cg fill='none' stroke='%23b99c6b' stroke-opacity='.28' stroke-width='1.2'%3E%3Cpath d='M-10 40 C30 10 60 70 100 40 S150 10 170 30'/%3E%3Cpath d='M-10 62 C30 32 62 92 102 62 S152 32 170 52'/%3E%3Cpath d='M-10 84 C32 56 64 112 104 84 S154 56 170 76'/%3E%3Cpath d='M-10 112 C34 86 66 138 106 112 S156 86 170 104'/%3E%3Cpath d='M-10 140 C36 116 68 162 108 140 S158 116 170 132'/%3E%3Cellipse cx='120' cy='28' rx='14' ry='8'/%3E%3C/g%3E%3C/svg%3E");
+  --grain:repeating-linear-gradient(90deg,rgba(0,0,0,.06) 0 2px,transparent 2px 9px),linear-gradient(180deg,#7a4e28,#5f3c1d);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ color-scheme:dark; --ink:#f3e9d8; --ink2:#d7c7ad; --mute:#a8977e; --paper:#2a2219; --paper2:#352b20; --line:#5a4834; --edge:#d9c6a3; --shadow:0 8px 22px rgba(0,0,0,.5); --sea:#7cc0de; }
+}
+:root[data-theme="dark"]{ color-scheme:dark; --ink:#f3e9d8; --ink2:#d7c7ad; --mute:#a8977e; --paper:#2a2219; --paper2:#352b20; --line:#5a4834; --edge:#d9c6a3; --shadow:0 8px 22px rgba(0,0,0,.5); --sea:#7cc0de; }
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{font-family:var(--font);color:var(--ink);background:#e8dcc2;-webkit-font-smoothing:antialiased}
+body.has-marquee{--mq:30px}
+button{font:inherit;color:inherit;cursor:pointer}
+a{color:var(--sea)}
+[hidden]{display:none!important}
+#marqueeBar{position:fixed;top:0;left:0;right:0;height:30px;background:var(--forest);color:#fff;z-index:1500;overflow:hidden;display:none;align-items:center;font-size:13px;font-weight:700}
+#marqueeBar.show{display:flex}
+#marqueeTrack{display:inline-block;white-space:nowrap;padding-left:100%;animation:marquee 30s linear infinite}
+#marqueeBar:hover #marqueeTrack{animation-play-state:paused}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+#stage{position:fixed;left:0;right:0;bottom:0;top:var(--mq);background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 66%,#e8dcc2 100%);transition:background 1.2s}
+body.night #stage{background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 70%,#1d2033 100%)}
+#stage canvas{display:block;width:100%;height:100%;touch-action:none}
+#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lab3d{position:absolute;left:0;top:0;white-space:nowrap;transition:opacity .2s;will-change:transform}
+.lab3d.off{opacity:0;pointer-events:none!important}
+/* 地點標籤＝小木牌 */
+.plab{pointer-events:auto;border:2px solid #3a2414;background:var(--grain);color:#fbf3df;font-size:12px;font-weight:700;padding:2px 9px 2px 5px;border-radius:5px;box-shadow:0 2px 0 #3a2414,0 3px 8px rgba(0,0,0,.25);display:flex;align-items:center;gap:5px}
+.plab i{width:11px;height:11px;border-radius:50%;border:1.5px solid #fbf3df;display:inline-block;background:#ccc}
+.plab:hover,.plab.on{background:var(--ember);border-color:#7a2f10}
+.plab.on{font-size:14px;padding:3px 11px 3px 6px}
+.ilab{font-weight:900;color:#4a3220;font-size:15px;text-shadow:0 0 4px #fff,0 0 8px #fff;letter-spacing:.15em}
+.ilab.main{font-size:26px;letter-spacing:.5em;color:rgba(74,50,32,.7)}
+body.night .ilab,body.night .pk{color:#e8e2ff;text-shadow:0 0 6px #000}
+.pk{font-size:11px;color:#3e3a36;text-shadow:0 0 3px #fff,0 0 6px #fff}
+.sealab{font-size:16px;color:rgba(255,255,255,.85);letter-spacing:.3em;text-shadow:0 1px 3px rgba(10,50,80,.5)}
+
+.ui{position:fixed;z-index:20}
+.card-ui{background:var(--paper) var(--topo) 0 0/160px 160px;border:2px solid var(--edge);border-radius:var(--r);box-shadow:var(--shadow)}
+/* 木牌標題 */
+#brand{left:14px;top:calc(var(--mq) + 12px);padding:9px 16px 10px 12px;display:flex;gap:10px;align-items:center;max-width:370px;background:var(--grain);color:#fbf3df;border:2px solid #3a2414;border-radius:8px;box-shadow:0 4px 0 #3a2414,var(--shadow)}
+#brand::before,#brand::after{content:'';position:absolute;top:50%;width:7px;height:7px;border-radius:50%;background:#2a180c;box-shadow:inset 0 1px 1px rgba(255,255,255,.3);transform:translateY(-50%)}
+#brand::before{left:5px}#brand::after{right:5px}
+#brand svg{flex:none;margin-left:6px}
+#brand h1{margin:0;font-weight:900;font-size:22px;line-height:1.15;letter-spacing:.1em}
+#brand p{margin:3px 0 0;font-size:12px;color:#ead9b8}
+
+#ctrl{left:400px;right:400px;bottom:14px;padding:8px 12px 8px;display:flex;gap:12px;align-items:center}
+#monBox{flex:none;text-align:center;min-width:64px;background:var(--grain);color:#fbf3df;border-radius:8px;padding:4px 6px;border:2px solid #3a2414}
+#monBox b{display:block;font-weight:900;font-size:24px;line-height:1.05}
+#monBox small{font-size:11px;color:#ead9b8}
+#axBars{flex:1;min-width:0;height:62px;display:grid;grid-template-columns:repeat(12,1fr);gap:3px;align-items:end}
+.axc{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;position:relative;background:transparent;border:0;padding:0;border-radius:6px}
+.axc i{width:70%;border-radius:4px 4px 0 0;background:#9bb98a;min-height:2px;transition:height .4s}
+.axc span{font-size:11px;color:var(--ink2);margin-top:2px;line-height:14px;white-space:nowrap}
+.axc span small{font-size:inherit}
+.axc b{position:absolute;top:0;font-size:10px;color:var(--forest);display:none}
+.axc.on i{background:var(--forest)}
+.axc.on span{background:var(--ember);color:#fff;border-radius:4px;padding:0 4px;font-weight:700}
+.axc.on b{display:block}
+.axc:hover i{background:#6f9a62}
+.cbtns{flex:none;display:flex;flex-direction:column;gap:4px}
+#play{width:38px;height:38px;border-radius:50%;border:2px solid var(--edge);background:var(--ember);color:#fff;font-size:15px}
+#play.on{background:var(--forest)}
+#btnNow{border:1.5px solid var(--line);background:var(--paper2);border-radius:8px;font-size:11px;padding:1px 4px}
+
+#mode{left:400px;top:calc(var(--mq) + 12px);padding:5px;display:flex;gap:4px}
+.mbtn{border:0;border-radius:8px;background:transparent;padding:6px 12px;font-size:14px;font-weight:700;color:var(--ink2)}
+.mbtn.on{background:var(--forest);color:#fff}
+#btnNight{background:#2d3359;color:#fff}
+body.night #btnNight{background:#f2b134;color:#3a2414}
+
+#panel{right:14px;top:calc(var(--mq) + 12px);bottom:14px;width:380px;display:flex;flex-direction:column;overflow:hidden}
+#panelHead{padding:12px 14px 10px;border-bottom:2px dashed var(--line);max-height:60%;overflow-y:auto}
+.selrow{display:flex;gap:6px}
+.selrow select{flex:1;min-width:0;font:inherit;font-size:14px;padding:7px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper2);color:var(--ink)}
+#place{margin-top:10px}
+#place h2{margin:0;font-weight:900;font-size:20px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+#place h2 small{font-weight:400;font-size:12px;color:var(--mute)}
+#place p{margin:5px 0 0;font-size:13px;color:var(--ink2);line-height:1.65}
+.lnk{border:0;background:none;padding:0;color:var(--sea);text-decoration:underline;font-weight:700}
+.meta{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;align-items:center}
+.meta span:not(.schip){font-size:11.5px;border-radius:999px;padding:1px 8px;background:var(--paper2);border:1px solid var(--line);color:var(--ink2)}
+.schip{display:inline-flex;align-items:center;gap:2px;font-size:12px;font-weight:700;border-radius:6px;padding:2px 8px;color:#fff;white-space:nowrap;letter-spacing:-.05em}
+.schip em{font-style:normal;opacity:.35}
+.s1{background:#7a6a8f}.s2{background:#d9822b}.s3{background:#c9a82e}.s4{background:#6fa63c}.s5{background:#2e7d4f}
+.temps{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:6px;margin-top:8px}
+.temps div{background:var(--paper2);border:1.5px solid var(--line);border-radius:8px;padding:4px 8px}
+.temps small{display:block;font-size:11px;color:var(--mute)}
+.temps b{font-size:18px;font-weight:900}
+.wxrow{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.wx{font-size:12px;border-radius:6px;padding:2px 8px;background:#e6eef5;border:1px solid #b9cfe0;color:#244a66}
+.ystrip{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;margin-top:8px}
+.yc{border:0;border-radius:5px;padding:2px 0;color:#fff;display:flex;flex-direction:column;align-items:center;line-height:1.15;opacity:.85}
+.yc span{font-size:10px}.yc em{font-style:normal;font-size:11px;font-weight:700}
+.yc.on{opacity:1;outline:2.5px solid var(--ink);outline-offset:1px}
+ul.hl{margin:8px 0 0;padding:0;list-style:none;font-size:13px;color:var(--ink2);line-height:1.6}
+.gear{margin-top:8px;font-size:12.5px;display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.gear b{color:var(--wood)}
+.gear span{border:1.5px dashed var(--wood2);border-radius:6px;padding:1px 7px;background:var(--cream);color:#5a3a1c}
+details.tips{margin-top:6px;font-size:12.5px;color:var(--ink2)}
+details.tips summary{cursor:pointer;color:var(--ember);font-weight:700}
+details.tips ul{margin:4px 0 0;padding-left:18px;line-height:1.6}
+dl.facts{display:grid;grid-template-columns:auto 1fr;gap:2px 8px;font-size:12px;margin:8px 0 0;color:var(--ink2)}
+dl.facts dt{font-weight:700;color:var(--wood)}dl.facts dd{margin:0}
+#sum{margin-top:8px;font-size:13px;background:var(--paper2);border-radius:8px;padding:6px 10px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+#sum b{font-weight:900;font-size:18px;color:var(--forest)}
+#list{flex:1;overflow-y:auto;padding:10px 12px 14px;display:flex;flex-direction:column;gap:7px}
+.scard{border:1.5px solid var(--line);background:var(--paper);border-radius:10px;padding:7px 10px;text-align:left;display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center}
+.scard:hover{border-color:var(--ember);box-shadow:0 3px 10px rgba(224,102,43,.2)}
+.scard b{font-size:14.5px;font-weight:900}
+.scard small{grid-column:1/-1;font-size:11.5px;color:var(--mute);line-height:1.5}
+.lgrp{font-size:12px;font-weight:700;color:var(--ink2);margin:4px 2px 0}
+#panelFoot{display:flex;justify-content:space-between;align-items:center;gap:6px 8px;flex-wrap:wrap;padding:7px 12px;border-top:2px dashed var(--line);font-size:12px;color:var(--mute)}
+#panelFoot button{border:0;background:none;padding:0;color:var(--sea);text-decoration:underline;font-size:12px}
+#panelFoot img{display:block}
+#panelFoot .warnline{flex-basis:100%;color:#a0462a}
+
+#legend{left:14px;bottom:14px;padding:8px 12px;font-size:12px;color:var(--ink2);width:370px;line-height:1.55}
+#legend .lg{display:flex;flex-wrap:wrap;gap:3px 10px}
+#legend .lg span{display:flex;align-items:center;gap:4px}
+#legend .lg i{width:11px;height:11px;border-radius:3px;display:inline-block;border:1px solid rgba(0,0,0,.15)}
+#legend .lt{font-weight:700;color:var(--ink)}
+.tbar{height:10px;border-radius:5px;margin:3px 0 1px;background:linear-gradient(90deg,#6b4da8 0%,#548ddb 14%,#73c7db 26%,#6bc26b 36%,#6bc26b 70%,#eed152 82%,#e6733f 100%)}
+.tlab{display:flex;justify-content:space-between;font-size:10.5px;color:var(--mute)}
+#tools{left:14px;bottom:150px;display:flex;flex-direction:column;gap:6px}
+.tbtn{border:2px solid var(--edge);background:var(--paper);border-radius:8px;padding:5px 11px;font-size:13px;box-shadow:0 2px 0 var(--edge);text-align:left}
+.tbtn:hover{background:var(--ember);color:#fff}
+.tbtn.hl{background:#fbe6c8;color:#6b3410}
+.tbtn.on{background:var(--forest);color:#fff}
+a.tbtn{text-decoration:none;color:var(--ink)}
+
+#loading{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;background:#e8dcc2 var(--topo) 0 0/200px 200px;transition:opacity .6s}
+#loading .box{background:var(--grain);color:#fbf3df;border:2px solid #3a2414;border-radius:10px;padding:16px 26px;text-align:center;box-shadow:0 5px 0 #3a2414}
+#loading.hide{opacity:0;pointer-events:none}
+#loading svg .fl{animation:flick .5s ease-in-out infinite alternate;transform-origin:22px 40px}
+@keyframes flick{to{transform:scaleY(.82)}}
+#loadMsg{font-size:19px;font-weight:900;margin-top:4px}
+#loading small{display:block;font-size:13px;color:#ead9b8;max-width:300px;margin-top:4px}
+
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:16px;padding-top:calc(16px + var(--mq));background:rgba(40,25,10,.5)}
+.modal.show{display:flex}
+.sheet{background:var(--paper) var(--topo) 0 0/180px 180px;border:2px solid var(--edge);border-radius:14px;box-shadow:0 18px 50px rgba(40,20,5,.4);width:min(860px,100%);max-height:calc(100vh - 32px - var(--mq));overflow:auto;position:relative}
+.x{position:absolute;right:12px;top:12px;width:38px;height:38px;border-radius:50%;border:2px solid var(--edge);background:var(--paper);font-size:18px;z-index:2}
+.x:hover{background:var(--ember);color:#fff}
+.pad .sheet{padding:20px 22px}
+.pad h2{font-weight:900;margin:0 0 10px;padding-right:44px;color:var(--wood)}
+.warn-box{border:1.5px solid #f0b4ac;background:#fff3f1;color:#6a2a22;border-radius:12px;padding:10px 14px;font-size:13.5px;line-height:1.7}
+.warn-box ul{margin:6px 0 0;padding-left:20px}
+.creator-box{margin-top:12px;border:1.5px solid var(--line);border-radius:12px;padding:10px 14px;font-size:13.5px;line-height:1.7;color:var(--ink2);background:var(--paper)}
+.etq{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.etq section{border:1.5px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--paper2)}
+.etq h3{margin:0 0 4px;font-weight:900;font-size:16px}
+.etq ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.65;color:var(--ink2)}
+.gloss{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:6px;margin-top:10px}
+.gloss div{font-size:13px;line-height:1.55;border-left:3px solid var(--ember);padding:2px 8px;color:var(--ink2)}
+.gloss b{color:var(--ink)}
+.pbtn{border:2px solid var(--edge);background:var(--ember);color:#fff;border-radius:10px;padding:8px 14px;font-weight:700}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-size:13px;border:1.5px solid var(--line);background:var(--paper2);border-radius:999px;padding:3px 10px}
+button.chip:hover,a.chip:hover{border-color:var(--ember);color:var(--ember)}
+.sbtn{border:1.5px solid var(--line);background:var(--paper2);border-radius:8px;padding:4px 10px;font-size:12.5px}
+.setbar{display:flex;justify-content:flex-end;gap:6px;margin-bottom:6px}
+.set-sec{border:1.5px solid var(--line);border-radius:10px;margin-bottom:8px;background:var(--paper)}
+.set-sec summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;font-weight:700;font-size:14px}
+.set-sec summary::-webkit-details-marker{display:none}
+.set-sec summary::before{content:'▸';color:var(--ember);margin-right:2px}
+.set-sec[open] summary::before{content:'▾'}
+.set-sec summary span{flex:1}
+.set-sec summary em{font-style:normal;font-weight:400;font-size:12px;color:var(--mute)}
+.set-body{padding:0 12px 12px;font-size:13.5px;color:var(--ink2)}
+.set-body select{font:inherit;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper2);color:var(--ink);width:100%;margin-top:4px}
+.set-body label.ck{display:flex;align-items:center;gap:8px}
+.set-body input[type=checkbox]{width:20px;height:20px}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]) .warn-box{background:#3a2226;color:#ffd9d3;border-color:#7a3a35} :root:not([data-theme="light"]) .gear span,:root:not([data-theme="light"]) .tbtn.hl{background:#3d2d1c;color:#f3d9b4} :root:not([data-theme="light"]) .wx{background:#22313d;color:#cfe3f2;border-color:#3d5a72} }
+:root[data-theme="dark"] .warn-box{background:#3a2226;color:#ffd9d3;border-color:#7a3a35}
+:root[data-theme="dark"] .gear span,:root[data-theme="dark"] .tbtn.hl{background:#3d2d1c;color:#f3d9b4}
+:root[data-theme="dark"] .wx{background:#22313d;color:#cfe3f2;border-color:#3d5a72}
+
+#sheetBtn{display:none}
+@media (max-width:1250px){
+  #legend{display:none}
+  #ctrl{left:14px}
+  #tools{bottom:112px}
+}
+@media (max-width:760px){
+  #brand{left:10px;right:10px;top:calc(var(--mq) + 8px);max-width:none;padding:6px 12px 7px}
+  #brand h1{font-size:18px}
+  #brand p{display:none}
+  #brand svg{width:30px;height:30px}
+  #ctrl{left:10px;right:10px;top:calc(var(--mq) + 62px);bottom:auto;padding:6px 8px;gap:6px}
+  #monBox{min-width:48px;padding:3px 4px}
+  #monBox b{font-size:18px}
+  #axBars{height:54px;gap:1px}
+  .axc span{font-size:10px}
+  .axc span small{display:none}
+  #mode{left:auto;right:10px;top:calc(var(--mq) + 146px);padding:3px}
+  .mbtn{padding:4px 8px;font-size:12.5px}
+  #panel{left:0;right:0;bottom:0;top:auto;width:auto;height:50vh;border-radius:16px 16px 0 0;border-bottom:0;transition:height .3s}
+  #panel.min{height:118px}
+  #sheetBtn{display:block;position:absolute;right:10px;top:8px;border:1.5px solid var(--line);background:var(--paper2);border-radius:8px;font-size:12px;padding:3px 8px;z-index:2}
+  #panelHead{padding:10px 12px 8px}
+  .selrow{padding-right:58px}
+  #panel.min #place p,#panel.min #place .meta,#panel.min #place details,#panel.min #place .temps,#panel.min #place .ystrip,#panel.min #place .gear,#panel.min #place .hl,#panel.min #place .wxrow,#panel.min #place .facts{display:none}
+  #tools{left:10px;bottom:calc(50vh + 10px);flex-direction:row;flex-wrap:wrap;right:10px;gap:4px}
+  body.sheet-min #tools{bottom:128px}
+  .tbtn{padding:3px 6px;font-size:11px;white-space:nowrap}
+  .etq{grid-template-columns:1fr}
+  .modal{padding:8px;padding-top:calc(8px + var(--mq))}
+}
+@media (prefers-reduced-motion: reduce){ #loading svg .fl,#marqueeTrack{animation:none} }
+</style>
+</head>
+<body>
+<div id="marqueeBar"><div id="marqueeTrack"></div></div>
+
+<div id="stage"><div id="labels"></div></div>
+
+<header id="brand" class="ui">
+  <svg width="40" height="40" viewBox="0 0 44 44" aria-hidden="true">
+    <path d="M4 38 L22 8 L40 38 Z" fill="#e0662b" stroke="#fbf3df" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M22 8 L16 38 M22 8 L28 38" stroke="#fbf3df" stroke-width="1.6"/>
+    <path d="M18 38 L22 26 L26 38 Z" fill="#3a2414"/>
+  </svg>
+  <div><h1>台灣露營地圖</h1><p>選月份，看哪裡露營最舒服</p></div>
+</header>
+
+<nav id="ctrl" class="ui card-ui" aria-label="月份">
+  <div id="monBox"><b id="monBig">1月</b><small id="monSub">冬</small></div>
+  <div id="axBars" title="長條＝那個月露營指數 4 以上（適合／很適合）的營地數"></div>
+  <div class="cbtns">
+    <button id="play" type="button" title="自動播放：一年十二個月跑一圈" aria-label="自動播放">▶</button>
+    <button id="btnNow" type="button" title="跳到這個月">本月</button>
+  </div>
+</nav>
+
+<div id="mode" class="ui card-ui" aria-label="顯示">
+  <button class="mbtn" id="btnLayer" type="button" title="地圖上顯示估算的夜間低溫">🌡 夜溫圖層</button>
+  <button class="mbtn" id="btnNight" type="button" title="切換白天／夜晚（鍵盤 N）">🌙 夜晚</button>
+</div>
+
+<aside id="panel" class="ui card-ui" aria-label="營地">
+  <button id="sheetBtn" type="button">收合</button>
+  <div id="panelHead">
+    <div class="selrow">
+      <select id="selRegion" aria-label="地區"></select>
+      <select id="selSpot" aria-label="營地"></select>
+    </div>
+    <div id="place"></div>
+    <div id="sum"></div>
+  </div>
+  <div id="list"></div>
+  <div id="panelFoot">
+    <span class="warnline">⚠ 氣溫與指數是依月平均氣溫估算的參考，不是天氣預報；營位與規定以各營地官方公告為準。<button type="button" id="btnEtq2">露營須知</button></span>
+    <span>創作者：<button type="button" id="btnCreator">Mark Tsai（蔡豐全）</button></span>
+    <img src="https://visitor-badge.laobi.icu/badge?page_id=m255525.taiwancampingmap" alt="訪客次數" height="20">
+  </div>
+</aside>
+
+<div id="tools" class="ui">
+  <button class="tbtn" id="btnAll" type="button">🗺 看全台灣</button>
+  <button class="tbtn hl" id="btnEtq" type="button">⛺ 露營須知</button>
+  <button class="tbtn" id="btnSet" type="button">⚙ 常用設定</button>
+  <button class="tbtn" id="installBtn" type="button">📲 加入主畫面</button>
+  <button class="tbtn" id="btnAbout" type="button">⚠ 使用警語</button>
+  <a class="tbtn" href="manual.html" target="_blank" rel="noopener">📖 操作手冊</a>
+</div>
+
+<div id="legend" class="ui card-ui">
+  <div class="lt">露營指數</div>
+  <div class="lg" id="lgScore"></div>
+  <div id="legendTemp">
+    <div class="lt" style="margin-top:4px">夜溫圖層（估算的夜間低溫）</div>
+    <div class="tbar"></div>
+    <div class="tlab"><span>0°C</span><span>5°</span><span>8°</span><span>舒服</span><span>22°</span><span>25°C+</span></div>
+  </div>
+  <div style="font-size:11.5px;margin-top:2px">細線＝等高線（每 250 公尺，粗線每 1,000 公尺）</div>
+</div>
+
+<div id="loading">
+  <div class="box">
+    <svg width="64" height="54" viewBox="0 0 44 44" aria-hidden="true">
+      <path d="M8 42 L36 36 M8 36 L36 42" stroke="#c79a62" stroke-width="3.5" stroke-linecap="round"/>
+      <path class="fl" d="M22 40 C12 36 14 24 22 12 C30 24 32 36 22 40 Z" fill="#f2b134"/>
+      <path class="fl" d="M22 40 C17 37 18 30 22 22 C26 30 27 37 22 40 Z" fill="#e0662b"/>
+    </svg>
+    <div id="loadMsg">正在生營火、搭帳篷…</div>
+    <small id="loadSub">第一次開啟需要下載 3D 繪圖元件，並計算各地的氣溫</small>
+  </div>
+</div>
+
+<div id="etq" class="modal pad" role="dialog" aria-modal="true" aria-labelledby="etqTitle">
+  <div class="sheet">
+    <button class="x" type="button" data-close aria-label="關閉">✕</button>
+    <h2 id="etqTitle">⛺ 露營須知</h2>
+    <p style="margin:0 0 12px;color:var(--ink2);font-size:14px"><b>無痕山林、看天出門、尊重營友。</b>天氣不好時，取消行程永遠是最安全的選擇。</p>
+    <div class="etq" id="etqBody"></div>
+    <h3 style="margin:16px 0 0">這張地圖上的天氣標記</h3>
+    <div class="gloss" id="wxBody"></div>
+    <h3 style="margin:16px 0 0">露營小辭典</h3>
+    <div class="gloss" id="glossBody"></div>
+  </div>
+</div>
+
+<div id="settings" class="modal pad" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+  <div class="sheet">
+    <button class="x" type="button" data-close aria-label="關閉">✕</button>
+    <h2 id="setTitle">⚙ 常用設定</h2>
+    <div class="setbar"><button class="sbtn" type="button" id="setOpenAll">全部展開</button><button class="sbtn" type="button" id="setCloseAll">全部收合</button></div>
+    <details class="set-sec" data-sec="month"><summary><span>📅 開啟時的月份</span><em id="sv-month"></em></summary>
+      <div class="set-body"><select id="setMonth"><option value="now">這個月</option><option value="last">記住上次看的月份</option></select></div></details>
+    <details class="set-sec" data-sec="night"><summary><span>🌙 開啟時的日夜</span><em id="sv-night"></em></summary>
+      <div class="set-body"><select id="setNight"><option value="day">白天</option><option value="night">夜晚</option><option value="auto">跟著現在時間（18 點後夜晚）</option></select></div></details>
+    <details class="set-sec" data-sec="layer"><summary><span>🌡 夜溫圖層</span><em id="sv-layer"></em></summary>
+      <div class="set-body"><label class="ck"><input type="checkbox" id="setLayer"> 開啟時就顯示估算的夜間低溫顏色</label></div></details>
+    <details class="set-sec" data-sec="labels"><summary><span>🏷 地圖上的營地標籤</span><em id="sv-labels"></em></summary>
+      <div class="set-body"><label class="ck"><input type="checkbox" id="setLabels"> 顯示營地名稱（選中的營地仍會顯示）</label></div></details>
+    <details class="set-sec" data-sec="motion"><summary><span>🌬 動畫</span><em id="sv-motion"></em></summary>
+      <div class="set-body">減少動態：營火、螢火蟲、海浪與雲幾乎不動。
+        <select id="setMotion"><option value="auto">跟隨系統</option><option value="full">完整動畫</option><option value="reduce">減少動態</option></select></div></details>
+    <details class="set-sec" data-sec="play"><summary><span>▶ 自動播放速度</span><em id="sv-play"></em></summary>
+      <div class="set-body"><select id="setPlay"><option value="1800">慢（每 1.8 秒一個月）</option><option value="1100">標準（每 1.1 秒一個月）</option><option value="600">快（每 0.6 秒一個月）</option></select></div></details>
+    <details class="set-sec" data-sec="theme"><summary><span>🎨 介面配色</span><em id="sv-theme"></em></summary>
+      <div class="set-body"><select id="setTheme"><option value="auto">跟隨系統</option><option value="light">淺色</option><option value="dark">深色</option></select></div></details>
+    <details class="set-sec" data-sec="about"><summary><span>ℹ 關於本工具</span><em>手冊・警語・創作者</em></summary>
+      <div class="set-body">
+        <div class="chips">
+          <a class="chip" href="manual.html" target="_blank" rel="noopener" style="text-decoration:none;color:inherit">📖 操作手冊</a>
+          <button class="chip" type="button" data-open-about>⚠ 使用警語</button>
+          <button class="chip" type="button" data-open-about="creator">👤 創作者資訊</button>
+          <button class="chip" type="button" data-install>📲 加入主畫面</button>
+          <button class="chip" type="button" data-open-etq>⛺ 露營須知</button>
+        </div>
+        <p style="font-size:12px;color:var(--mute);margin:10px 0 0;display:flex;align-items:center;gap:8px">訪客數 <img src="https://visitor-badge.laobi.icu/badge?page_id=m255525.taiwancampingmap" alt="訪客次數" height="20"></p>
+      </div></details>
+    <p style="font-size:12px;color:var(--mute);margin:10px 0 0">設定只存在這台裝置的瀏覽器，不會上傳。</p>
+  </div>
+</div>
+
+<div id="about" class="modal pad" role="dialog" aria-modal="true" aria-labelledby="aboutTitle">
+  <div class="sheet">
+    <button class="x" type="button" data-close aria-label="關閉">✕</button>
+    <h2 id="aboutTitle">關於台灣露營地圖</h2>
+    <div class="warn-box">
+      <strong>使用警語</strong>
+      <ul>
+        <li>地圖上的氣溫、夜溫圖層與露營指數，是用各地<b>月平均氣溫的概略值</b>加上海拔遞減（每 100 公尺約 0.55°C）估算的一般參考，<b>不是天氣預報</b>；實際溫度受天氣系統、地形與當天天候影響很大，出發前請查中央氣象署的預報與警特報。</li>
+        <li>季風、梅雨、颱風、午後雷陣雨的月份是一般氣候特徵；颱風、豪雨、低溫特報發布時，請取消行程或提早撤離。</li>
+        <li>營地的營位、收費、開放時間、預約方式與用火規定經常變動，部分營地可能停業、整修或改由其他單位經營，<b>一律以各營地或主管機關的官方公告為準</b>；可到交通部觀光署露營場資訊平台查詢是否為合法登記的營地。</li>
+        <li>地圖上的海岸線、山高與營地位置都經過簡化與誇大，不可作為導航或登山依據；高海拔營地請注意高山症與低溫。</li>
+        <li>本工具為個人製作的教學工具，與各營地、農場、國家公園、風景區管理處及縣市政府無關，也不代表推薦或背書。</li>
+        <li>本工具內容（文字說明、介面、3D 模型）僅供教學、課程及個人使用，禁止未經授權公開發布、販售或商業化使用。</li>
+      </ul>
+    </div>
+    <p style="margin:10px 0 0;font-size:13px;color:var(--ink2);line-height:1.7"><b>資料來源</b>：營地資訊——各營地官網、交通部觀光署露營場資訊平台與公開報導（2026-11 整理）；氣溫——參考中央氣象署各測站月平均氣溫，簡化為概略值；台灣與離島輪廓、地形——沿用作者「台灣賞鳥地圖」的手描簡化圖。完整清單見操作手冊。</p>
+    <p style="margin:12px 0 0"><button class="pbtn" type="button" id="btnEtq3">⛺ 看露營須知</button></p>
+    <div class="creator-box" id="creatorBox">
+      <p style="margin:0"><strong>創作者：Mark Tsai（蔡豐全）</strong></p>
+      <p style="margin:4px 0">勞動力發展署創業顧問（2017 起）、經濟部 SBIR 海選專案評審委員（2019－2024），長期擔任小型企業人力提升計畫顧問與多項政府計畫業師、評審委員；專長銷售數據分析、AI 工具運用、政府補助計畫申請、創業與跨境電商。</p>
+      <p style="margin:0"><a href="manual.html#creator" target="_blank" rel="noopener">完整經歷與證照</a>｜<a href="mailto:tsaimark@gmail.com">tsaimark@gmail.com</a></p>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="scene.js"></script>
+<script src="app.js"></script>
+<script>
+/* ================= 頂部跑馬燈 — 獨立運作，沿用工作區共用授權伺服器的公告內容 ================= */
+(function () {
+  'use strict';
+  var MARQUEE_CHECK_URL = "https://script.google.com/macros/s/AKfycbwKX0DNNbY8y4nf90BFTHtxgfqJcHHcZasRrgycl4QAe52_hkjMWSkYk4xOsqU-JPCROw/exec";
+  var STORAGE_KEY = 'taiwanCampMarquee';
+  var REFRESH_MS = 20 * 60 * 1000;
+  var bar = document.getElementById('marqueeBar');
+  var track = document.getElementById('marqueeTrack');
+  var lastKey = null;
+  function loadCache() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { return []; } }
+  function saveCache(items) { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(items)); } catch (e) {} }
+  function appendParsedText(container, text) {
+    var re = /\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, lastIndex = 0, m;
+    while ((m = re.exec(text))) {
+      if (m.index > lastIndex) container.appendChild(document.createTextNode(text.slice(lastIndex, m.index)));
+      var a = document.createElement('a');
+      a.href = m[2]; a.textContent = m[1]; a.target = '_blank'; a.rel = 'noopener noreferrer';
+      a.style.color = 'inherit'; a.style.textDecoration = 'underline';
+      container.appendChild(a);
+      lastIndex = re.lastIndex;
+    }
+    if (lastIndex < text.length) container.appendChild(document.createTextNode(text.slice(lastIndex)));
+  }
+  function buildTrackContent(items) {
+    var frag = document.createDocumentFragment();
+    function appendPass() { items.forEach(function (item, idx) { if (idx > 0) frag.appendChild(document.createTextNode('　★　')); appendParsedText(frag, item); }); }
+    appendPass(); frag.appendChild(document.createTextNode('　★　')); appendPass();
+    return frag;
+  }
+  function render(items) {
+    if (!items || !items.length) return;
+    var key = JSON.stringify(items);
+    if (key === lastKey) return;
+    lastKey = key;
+    track.innerHTML = '';
+    track.appendChild(buildTrackContent(items));
+    bar.classList.add('show');
+    document.body.classList.add('has-marquee');
+    var width = track.scrollWidth / 2;
+    track.style.animationDuration = Math.max(width / 80, 10) + 's';
+  }
+  function fetchMarquee() {
+    fetch(MARQUEE_CHECK_URL, { method: 'POST', body: JSON.stringify({ serial: '' }) })
+      .then(function (r) { return r.json(); })
+      .then(function (data) { if (data && Array.isArray(data.marquee) && data.marquee.length) { saveCache(data.marquee); render(data.marquee); } })
+      .catch(function () {});
+  }
+  render(loadCache());
+  fetchMarquee();
+  setInterval(fetchMarquee, REFRESH_MS);
+})();
+</script>
+<script>
+/* ================= 加入主畫面（PWA） ================= */
+(function () {
+  'use strict';
+  var deferredPrompt = null;
+  var btn = document.getElementById('installBtn');
+  var ua = navigator.userAgent || '';
+  var isIOSDevice = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var isMacDesktop = /Macintosh/.test(ua) && !isIOSDevice;
+  var isSafariEngine = /^((?!chrome|crios|fxios|edgios|android).)*safari/i.test(ua);
+  var isStandalone = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
+  function fallbackMessage() {
+    if (isIOSDevice) return '請點畫面上的「分享」圖示，選「加入主畫面」';
+    if (isMacDesktop && isSafariEngine) return '請用選單列「檔案」→「加入 Dock」（Safari 17 以上）';
+    return '瀏覽器不支援，或已安裝過';
+  }
+  window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferredPrompt = e; });
+  window.addEventListener('appinstalled', function () { deferredPrompt = null; });
+  function bindInstall(btn) {
+    if (isStandalone) { btn.style.display = 'none'; return; }
+    btn.addEventListener('click', function () {
+      if (!deferredPrompt) { window.alert(fallbackMessage()); return; }
+      try { deferredPrompt.prompt(); deferredPrompt.userChoice.then(function () { deferredPrompt = null; }); }
+      catch (err) { window.alert(fallbackMessage()); }
+    });
+  }
+  if (btn) bindInstall(btn);
+  document.querySelectorAll('[data-install]').forEach(bindInstall);
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () { navigator.serviceWorker.register('service-worker.js').catch(function () {}); });
+  }
+})();
+</script>
+</body>
+</html>
