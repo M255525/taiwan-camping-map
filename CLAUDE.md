@@ -16,7 +16,7 @@
 ## 配套
 - ✅ 跑馬燈、manual（指數算法、總表、資料來源、完整創作者）、使用警語（底部＋首訪自動跳，`taiwanCampSeenWarning`）、⚙常用設定收合式（`taiwanCampSettings`；展開 `taiwanCampSetOpen`）、偏好 `taiwanCampPrefs`、PWA（改 js 記得 `CACHE_NAME` +1）、訪客計數器 `page_id=m255525.taiwancampingmap`、RWD（375px 無橫向捲動；手機月份軸只顯示數字）。
 - ❌ 序號授權
-- GitHub Pages：`master`＋`.github/workflows/deploy-pages.yml`，https://m255525.github.io/taiwan-camping-map/ （repo 由使用者自己 `gh repo create`，Pages 由 Claude 用 `gh api` 開啟後重跑 workflow）。
+- GitHub Pages（**2026-11-12 已上線**）：`master`＋`.github/workflows/deploy-pages.yml`，https://m255525.github.io/taiwan-camping-map/ （repo 由使用者自己 `gh repo create`，Pages 由 Claude 用 `gh api` 開啟後重跑 workflow）。
 
 ## Port／測試
 - port **8870**（`.claude/launch.json` 的 `taiwan-camping-map`）。
