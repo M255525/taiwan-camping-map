@@ -103,7 +103,7 @@ function render(opts){
     place.innerHTML = '<h2>' + esc(sp.name) + '<small>' + esc(sp.city) + '</small></h2>' +
       '<div class="meta">' + scoreChip(c.score, '（' + m + '月）') + '<span>' + CM.TYPES[sp.type].icon + ' ' + CM.TYPES[sp.type].name + '</span><span>海拔約 ' + sp.elev.toLocaleString() + ' m</span></div>' +
       '<div class="temps"><div><small>夜晚約</small><b>' + deg(c.tn) + '</b></div><div><small>白天約</small><b>' + deg(c.th) + '</b></div><div><small>睡袋舒適溫度</small><b>' + CM.bagTemp(c.tn) + '°C 以下</b></div></div>' +
-      '<div class="actrow"><button type="button" class="main" data-act="check">🎒 完整裝備清單</button><button type="button" data-act="share">🔗 分享</button><button type="button" data-act="line">💬 傳到 LINE</button></div>' +
+      '<div class="actrow"><button type="button" class="main" data-act="check">🎒 完整裝備清單</button><button type="button" data-act="share">🔗 分享</button><button type="button" data-act="line">💬 傳到 LINE</button><button type="button" data-act="cmp">⚖ 比較</button></div>' +
       sunRow(sp, m) +
       (c.wx.length ? '<div class="wxrow">' + wxChips(c) + '</div>' : '') +
       yearStrip(sp) +
@@ -173,6 +173,45 @@ function share(){
   var fallback = function(){ var t = document.createElement('textarea'); t.value = u; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (e){ toast(u); } t.remove(); };
   if (navigator.clipboard) navigator.clipboard.writeText(u).then(done, fallback); else fallback();
 }
+/* ---------- 營地比較 ---------- */
+var CMP_KEY = 'taiwanCampCompare';
+function cmpOptions(none){
+  return (none ? '<option value="">（不比較第三個）</option>' : '') + CM.REGIONS.map(function(r){
+    return '<optgroup label="' + r.name + '">' + CM.SPOTS.filter(function(p){ return p.r === r.id; }).map(function(p){ return '<option value="' + p.id + '">' + esc(p.name) + '</option>'; }).join('') + '</optgroup>';
+  }).join('');
+}
+function openCmp(first){
+  var ids = lsGet(CMP_KEY, []).filter(function(id){ return CM.spotById[id]; });
+  if (first){
+    ids = [first].concat(ids.filter(function(id){ return id !== first; }));
+    if (ids.length < 2){ var p0 = CM.spotById[first], alt = CM.SPOTS.filter(function(p){ return p.r === p0.r && p.id !== first; })[0] || CM.SPOTS.filter(function(p){ return p.id !== first; })[0]; ids.push(alt.id); }
+  }
+  if (ids.length < 2) ids = ['wuling', 'dongshi'];
+  $('cmpA').innerHTML = cmpOptions(); $('cmpB').innerHTML = cmpOptions(); $('cmpC').innerHTML = cmpOptions(true);
+  $('cmpA').value = ids[0]; $('cmpB').value = ids[1]; $('cmpC').value = ids[2] || '';
+  renderCmp(); openModal('cmp');
+}
+function renderCmp(){
+  var ids = [$('cmpA').value, $('cmpB').value, $('cmpC').value].filter(function(id, i, a){ return id && a.indexOf(id) === i; });
+  lsSet(CMP_KEY, ids);
+  var sp = ids.map(function(id){ return CM.spotById[id]; }), m, h = '<table class="cmp"><thead><tr><th></th>' + sp.map(function(p){ return '<th>' + CM.TYPES[p.type].icon + ' ' + esc(p.name) + '</th>'; }).join('') + '</tr></thead><tbody>';
+  var row = function(lab, f){ h += '<tr><td class="lab">' + lab + '</td>' + sp.map(function(p){ return '<td>' + f(p) + '</td>'; }).join('') + '</tr>'; };
+  row('地點', function(p){ return esc(p.city) + '<br>海拔約 ' + p.elev.toLocaleString() + ' m'; });
+  row('營位', function(p){ return esc(p.pitch); });
+  row('用火', function(p){ return p.fire ? esc(p.fire) : /禁止生火/.test(p.tips.join()) ? '禁止生火' : '依營地規定'; });
+  row('預約', function(p){ return esc(p.book || '出發前先向營地確認'); });
+  for (m = 1; m <= 12; m++){
+    h += '<tr class="mrow' + (m === st.month ? ' on' : '') + '"><td class="lab"><button type="button" data-m="' + m + '">' + m + '月</button></td>' + sp.map(function(p){
+      var c = CM.climate(p, m);
+      return '<td class="sc" style="background:' + CM.SCORES[c.score].c + '" title="' + esc(c.why.join('、') || '條件良好') + '">' + c.score + ' ' + CM.SCORES[c.score].name + '<small>夜 ' + deg(c.tn) + '・日 ' + deg(c.th) + (c.wx.length ? ' ' + c.wx.map(function(k){ return CM.WXTYPES[k].icon; }).join('') : '') + '</small></td>';
+    }).join('') + '</tr>';
+  }
+  row('最適合', function(p){
+    var best = []; for (var k = 1; k <= 12; k++) if (CM.climate(p, k).score >= 4) best.push(k);
+    return best.length ? '<b style="color:var(--forest)">' + best.join('、') + ' 月</b>' : '沒有指數 4 以上的月份';
+  });
+  $('cmpBody').innerHTML = h + '</tbody></table>';
+}
 function selectSpot(id){ if (id && innerWidth <= 760 && $('panel').classList.contains('min')) setSheet(false); st.spot = id || null; if (st.spot){ st.region = CM.spotById[st.spot].r; if (st.type !== 'all' && CM.spotById[st.spot].type !== st.type) st.type = 'all'; } fillSelectors(); render({fly:true}); }
 function selectRegion(r){ st.region = r; st.spot = null; st.type = 'all'; fillSelectors(); render({fly:true}); }
 function setNight(on){ st.night = !!on; render(); }
@@ -223,7 +262,7 @@ function bind(){
   $('list').addEventListener('click', function(e){ var c = e.target.closest('.scard'); if (c) selectSpot(c.dataset.spot); });
   $('place').addEventListener('click', function(e){
     var a = e.target.closest('[data-act]');
-    if (a){ if (a.dataset.act === 'check') openCheck(); else if (a.dataset.act === 'share') share(); else window.open('https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(shareUrl()), '_blank', 'noopener'); return; }
+    if (a){ if (a.dataset.act === 'check') openCheck(); else if (a.dataset.act === 'cmp') openCmp(st.spot); else if (a.dataset.act === 'share') share(); else window.open('https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(shareUrl()), '_blank', 'noopener'); return; }
     var y = e.target.closest('[data-m]'); if (y){ stopPlay(); setMonth(+y.dataset.m); return; }
     var s = e.target.closest('[data-spot]'); if (s) selectSpot(s.dataset.spot);
   });
@@ -232,6 +271,9 @@ function bind(){
   $('ckReset').addEventListener('click', function(){ lsSet(CK_KEY, {}); openCheck(true); });
   $('ckPrint').addEventListener('click', function(){ document.body.classList.add('printing'); window.print(); });
   addEventListener('afterprint', function(){ document.body.classList.remove('printing'); });
+  $('btnCmp').addEventListener('click', function(){ openCmp(st.spot); });
+  ['cmpA', 'cmpB', 'cmpC'].forEach(function(id){ $(id).addEventListener('change', renderCmp); });
+  $('cmpBody').addEventListener('click', function(e){ var b = e.target.closest('[data-m]'); if (b){ stopPlay(); setMonth(+b.dataset.m); renderCmp(); } });
   $('btnAll').addEventListener('click', function(){ st.region = 'all'; st.spot = null; fillSelectors(); render({fly:true}); });
   $('btnAbout').addEventListener('click', function(){ openModal('about'); });
   ['btnEtq', 'btnEtq2', 'btnEtq3'].forEach(function(id){ $(id).addEventListener('click', function(){ if (id === 'btnEtq3') closeModal($('about')); openModal('etq'); }); });
@@ -287,5 +329,5 @@ CampScene.init({host:$('stage'), labels:$('labels'), reduce:reduceOn(), month:st
   $('loading').addEventListener('click', function(){ $('loading').classList.add('hide'); firstVisit(); }, {once:true});
 });
 
-window.__camp = {state:st, openCheck:openCheck, shareUrl:shareUrl, setMonth:setMonth, selectSpot:selectSpot, selectRegion:selectRegion, setNight:setNight, setLayer:setLayer, CM:CM, scene:CampScene};
+window.__camp = {state:st, openCmp:openCmp, openCheck:openCheck, shareUrl:shareUrl, setMonth:setMonth, selectSpot:selectSpot, selectRegion:selectRegion, setNight:setNight, setLayer:setLayer, CM:CM, scene:CampScene};
 })();

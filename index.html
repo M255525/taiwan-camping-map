@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>台灣露營地圖</title>
-<meta name="description" content="3D 台灣露營地圖：選月份看哪裡露營最舒服——14 個營地的露營指數、夜間低溫、季風梅雨颱風提醒、建議睡袋與裝備，夜晚模式看星空、營火與螢火蟲。">
+<meta name="description" content="3D 台灣露營地圖：選月份看哪裡露營最舒服——21 個營地的露營指數、夜間低溫、季風梅雨颱風提醒、建議睡袋與裝備，夜晚模式看星空、營火與螢火蟲。">
 <meta name="theme-color" content="#5b3a1f">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" href="icons/favicon.png">
@@ -224,6 +224,21 @@ button.chip:hover,a.chip:hover{border-color:var(--ember);color:var(--ember)}
 .ckbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:10px;font-size:13px;color:var(--ink2)}
 .ckbar b{font-size:18px;color:var(--forest)}
 .ckbar .sp{flex:1}
+.cmpsel{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.cmpsel select{font:inherit;font-size:13.5px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--line);background:var(--paper2);color:var(--ink);width:100%}
+.cmpwrap{overflow-x:auto}
+table.cmp{border-collapse:separate;border-spacing:3px;width:100%;min-width:480px;font-size:13px}
+table.cmp th{text-align:left;font-weight:900;color:var(--wood);padding:4px 6px;vertical-align:bottom}
+table.cmp td{background:var(--paper2);border-radius:7px;padding:4px 7px;vertical-align:top;color:var(--ink2)}
+table.cmp td.lab{position:sticky;left:0;z-index:1;background:var(--paper);font-weight:700;color:var(--ink);white-space:nowrap;width:1%}
+table.cmp tr.mrow td.lab button{border:1.5px solid var(--line);background:var(--paper);border-radius:6px;padding:1px 8px;font-weight:700}
+table.cmp tr.mrow.on td{outline:2px solid var(--ember)}
+table.cmp tr.mrow.on td.lab{outline:none}
+table.cmp td.sc{color:#fff;font-weight:700}
+table.cmp td.sc small{display:block;font-weight:400;opacity:.92;font-size:11.5px}
+table.cmp td.best{font-weight:700;color:var(--forest)}
+.cmpnote{font-size:12.5px;color:var(--mute);margin:8px 0 0}
+@media (max-width:760px){ .cmpsel{grid-template-columns:1fr} }
 #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2e2418;color:#fff;padding:8px 16px;border-radius:999px;font-size:14px;z-index:200;opacity:0;pointer-events:none;transition:opacity .25s}
 #toast.show{opacity:1}
 @media (max-width:760px){ .ckcols{grid-template-columns:1fr} }
@@ -319,6 +334,7 @@ button.chip:hover,a.chip:hover{border-color:var(--ember);color:var(--ember)}
   <button class="tbtn hl" id="btnEtq" type="button">⛺ 露營須知</button>
   <button class="tbtn" id="btnSet" type="button">⚙ 常用設定</button>
   <button class="tbtn" id="installBtn" type="button">📲 加入主畫面</button>
+  <button class="tbtn" id="btnCmp" type="button">⚖ 比較營地</button>
   <button class="tbtn" id="btnAbout" type="button">⚠ 使用警語</button>
   <a class="tbtn" href="manual.html" target="_blank" rel="noopener">📖 操作手冊</a>
 </div>
@@ -359,6 +375,16 @@ button.chip:hover,a.chip:hover{border-color:var(--ember);color:var(--ember)}
   </div>
 </div>
 
+<div id="cmp" class="modal pad" role="dialog" aria-modal="true" aria-labelledby="cmpTitle">
+  <div class="sheet">
+    <button class="x" type="button" data-close aria-label="關閉">✕</button>
+    <h2 id="cmpTitle">⚖ 營地比較</h2>
+    <p style="margin:0 0 10px;color:var(--ink2);font-size:13.5px">選 2～3 個營地，並排看全年 12 個月的露營指數與估算夜溫、白天溫度。點左邊的月份可以把地圖切到那個月。</p>
+    <div class="cmpsel"><select id="cmpA" aria-label="營地一"></select><select id="cmpB" aria-label="營地二"></select><select id="cmpC" aria-label="營地三"></select></div>
+    <div class="cmpwrap" id="cmpBody"></div>
+    <p class="cmpnote">指數與溫度是依月平均氣溫估算的參考，不是天氣預報；營位與規定以各營地官方公告為準。</p>
+  </div>
+</div>
 <div id="check" class="modal pad" role="dialog" aria-modal="true" aria-labelledby="checkTitle">
   <div class="sheet">
     <button class="x" type="button" data-close aria-label="關閉">✕</button>
