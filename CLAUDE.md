@@ -11,7 +11,8 @@
 ## 程式
 - **`scene.js` 是產出檔**：改 `tools/scene_tpl.js`，再跑 `python tools/build_scene.py ../taiwan-flower-map/scene.js`，會把賞花地圖 scene.js 的共用段落（幾何地形、標籤、營地排列、雲、鏡頭、點選）組進來；`TF` 在樣板裡是指向 `CM` 的別名。賞花地圖若改了這些段落的區段標題註解，切段會失敗。
 - 營地群組放大 1.5 倍（`K`），近拍距離 2.6；營火點光源只照選中的營地（distance .4、強度 .5，太大會把地面照成一大片黃）。
-- `app.js`：測試 hook `window.__camp`（`state/setMonth/selectSpot/selectRegion/setNight/setLayer/CM/scene`）。
+- `app.js`：測試 hook `window.__camp`（`state/setMonth/selectSpot/selectRegion/setNight/setLayer/openCheck/shareUrl/CM/scene`）。
+- 2026-11-12 加：營地型態篩選（`st.type`，`spotsInScope` 已套用，月份長條也跟著算）；日出日落 `CM.sun(p,m)`（NOAA 簡化公式、每月 15 日、UTC+8）；裝備檢查清單 `CM.checklist(p,c)`＝依條件加帶＋五類基本清單，勾選存 `taiwanCampChecklist`（以項目文字為 key），列印用 `body.printing`；分享網址 `#m=月&s=營地`（或 `&r=地區`）會覆蓋上次紀錄，`save()` 用 `replaceState` 同步網址。
 
 ## 配套
 - ✅ 跑馬燈、manual（指數算法、總表、資料來源、完整創作者）、使用警語（底部＋首訪自動跳，`taiwanCampSeenWarning`）、⚙常用設定收合式（`taiwanCampSettings`；展開 `taiwanCampSetOpen`）、偏好 `taiwanCampPrefs`、PWA（改 js 記得 `CACHE_NAME` +1）、訪客計數器 `page_id=m255525.taiwancampingmap`、RWD（375px 無橫向捲動；手機月份軸只顯示數字）。

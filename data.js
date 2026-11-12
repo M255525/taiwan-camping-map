@@ -236,6 +236,35 @@ CM.gear = function(p, c){
   return g;
 };
 
+/* 日出日落（每月 15 日、NOAA 簡化公式、台灣時間；山谷地形遮蔽不計，僅供參考） */
+CM.sun = function(p, m){
+  var N = [15, 46, 74, 105, 135, 166, 196, 227, 258, 288, 319, 349][m - 1], g = 2 * Math.PI / 365 * (N - 1), r = Math.PI / 180;
+  var eq = 229.18 * (.000075 + .001868 * Math.cos(g) - .032077 * Math.sin(g) - .014615 * Math.cos(2 * g) - .040849 * Math.sin(2 * g));
+  var de = .006918 - .399912 * Math.cos(g) + .070257 * Math.sin(g) - .006758 * Math.cos(2 * g) + .000907 * Math.sin(2 * g) - .002697 * Math.cos(3 * g) + .00148 * Math.sin(3 * g);
+  var la = p.at[1] * r, ha = Math.acos(Math.cos(90.833 * r) / (Math.cos(la) * Math.cos(de)) - Math.tan(la) * Math.tan(de)) / r;
+  var rise = 720 - 4 * (p.at[0] + ha) - eq + 480, set = 720 - 4 * (p.at[0] - ha) - eq + 480;
+  var hm = function(v){ v = Math.round(v); return String(Math.floor(v / 60)).padStart(2, '0') + ':' + String(v % 60).padStart(2, '0'); };
+  return {rise:hm(rise), set:hm(set), dark:hm(set + 25), pitch:hm(set - 60), dayH:Math.round((set - rise) / 6) / 10};
+};
+
+/* 裝備檢查清單：基本清單＋依營地與月份加上的項目 */
+CM.CHECK_BASE = [
+  {g:'⛺ 帳篷與營位', items:['帳篷（含外帳、營柱）', '營釘、營繩、營槌', '地布', '天幕或遮雨布']},
+  {g:'🛏 睡眠', items:['睡袋', '睡墊或充氣床', '枕頭']},
+  {g:'🍳 炊事', items:['爐具與瓦斯罐', '鍋具、餐具', '飲用水', '食材（冰桶保冷）', '垃圾袋（帶下山）']},
+  {g:'🔦 照明與用品', items:['頭燈（含備用電池）', '營燈', '行動電源', '桌椅']},
+  {g:'🩹 安全與個人', items:['急救包、個人藥品', '換洗衣物', '盥洗用品', '證件、預約確認資料']}
+];
+CM.checklist = function(p, c){
+  var extra = CM.gear(p, c).filter(function(x){ return !/^隨時看|^注意/.test(x); });
+  if (/禁止生火|禁生柴|禁止生柴|嚴禁生柴/.test((p.fire || '') + p.tips.join())) extra.push('不能生柴：改帶爐具或合格烤肉架');
+  if (c.wx.indexOf('ty') >= 0) extra.push('出發前查颱風警報（有警報就取消）');
+  if (p.elev >= 2000) extra.push('高山症注意：慢慢上升、多喝水');
+  var groups = CM.CHECK_BASE.slice();
+  if (extra.length) groups = [{g:'📌 ' + c.m + '月・' + p.name + ' 加帶', items:extra, hot:true}].concat(groups);
+  return groups;
+};
+
 /* ---------- 島嶼輪廓（沿用台灣賞鳥地圖，手描簡化） ---------- */
 CM.ISLANDS = [
   {id:'taiwan', name:'台灣', main:true, poly:[

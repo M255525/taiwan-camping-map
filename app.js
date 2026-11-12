@@ -15,8 +15,16 @@ var set = Object.assign({month:'now', labels:true, layer:true, night:'day', moti
 var pref = lsGet(PREF_KEY, {});
 var st = {month:set.month === 'last' && pref.month ? pref.month : nowMonth(), region:CM.regionById[pref.region] ? pref.region : 'all', spot:CM.spotById[pref.spot] ? pref.spot : null,
   layer:set.layer !== false, night:set.night === 'night' || (set.night === 'auto' && isNightNow())};
+st.type = 'all';
+/* 分享連結：#m=4&s=dongshi（優先於上次紀錄） */
+(function(){
+  var h = {}; location.hash.replace(/^#/, '').split('&').forEach(function(kv){ var q = kv.split('='); if (q[1]) h[q[0]] = decodeURIComponent(q[1]); });
+  if (+h.m >= 1 && +h.m <= 12) st.month = +h.m;
+  if (CM.spotById[h.s]) st.spot = h.s; else if (CM.regionById[h.r]){ st.region = h.r; st.spot = null; }
+})();
 if (st.spot) st.region = CM.spotById[st.spot].r;
-function save(){ lsSet(PREF_KEY, {month:st.month, region:st.region, spot:st.spot}); }
+function shareUrl(){ return location.origin + location.pathname + '#m=' + st.month + (st.spot ? '&s=' + st.spot : st.region !== 'all' ? '&r=' + st.region : ''); }
+function save(){ lsSet(PREF_KEY, {month:st.month, region:st.region, spot:st.spot}); try { history.replaceState(null, '', location.pathname + '#m=' + st.month + (st.spot ? '&s=' + st.spot : st.region !== 'all' ? '&r=' + st.region : '')); } catch (e){} }
 function reduceOn(){ return set.motion === 'reduce' || (set.motion === 'auto' && matchMedia('(prefers-reduced-motion: reduce)').matches); }
 function applyTheme(){ if (set.theme === 'auto') document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', set.theme); }
 applyTheme();
@@ -24,7 +32,18 @@ applyTheme();
 function scoreChip(s, extra){ var x = CM.SCORES[s]; return '<span class="schip s' + s + '" title="' + esc(x.tip) + '">' + '●●●●●'.slice(0, s) + '<em>' + '●●●●●'.slice(s) + '</em> ' + x.name + (extra || '') + '</span>'; }
 function wxChips(c){ return c.wx.map(function(k){ var w = CM.WXTYPES[k]; return '<span class="wx" title="' + esc(w.tip) + '">' + w.icon + ' ' + w.name + '</span>'; }).join(''); }
 function hlNow(p, m){ return p.hl.filter(function(h){ return h.months[m]; }); }
-function spotsInScope(){ return CM.SPOTS.filter(function(p){ return st.region === 'all' || p.r === st.region; }); }
+function regionSpots(){ return CM.SPOTS.filter(function(p){ return st.region === 'all' || p.r === st.region; }); }
+function spotsInScope(){ return regionSpots().filter(function(p){ return st.type === 'all' || p.type === st.type; }); }
+function renderTypes(){
+  var bar = $('typeBar'); bar.hidden = !!st.spot; if (st.spot) return;
+  var rs = regionSpots();
+  bar.innerHTML = '<button type="button" data-type="all" class="' + (st.type === 'all' ? 'on' : '') + '">全部 ' + rs.length + '</button>' + Object.keys(CM.TYPES).map(function(k){
+    var n = rs.filter(function(p){ return p.type === k; }).length;
+    return '<button type="button" data-type="' + k + '" class="' + (st.type === k ? 'on' : '') + '"' + (n ? '' : ' disabled') + '>' + CM.TYPES[k].icon + ' ' + CM.TYPES[k].name + ' ' + n + '</button>';
+  }).join('');
+}
+var toastT = 0;
+function toast(msg){ var t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(function(){ t.classList.remove('show'); }, 2400); }
 
 /* ---------- 選擇器與月份軸 ---------- */
 function fillSelectors(){
@@ -84,6 +103,8 @@ function render(opts){
     place.innerHTML = '<h2>' + esc(sp.name) + '<small>' + esc(sp.city) + '</small></h2>' +
       '<div class="meta">' + scoreChip(c.score, '（' + m + '月）') + '<span>' + CM.TYPES[sp.type].icon + ' ' + CM.TYPES[sp.type].name + '</span><span>海拔約 ' + sp.elev.toLocaleString() + ' m</span></div>' +
       '<div class="temps"><div><small>夜晚約</small><b>' + deg(c.tn) + '</b></div><div><small>白天約</small><b>' + deg(c.th) + '</b></div><div><small>睡袋舒適溫度</small><b>' + CM.bagTemp(c.tn) + '°C 以下</b></div></div>' +
+      '<div class="actrow"><button type="button" class="main" data-act="check">🎒 完整裝備清單</button><button type="button" data-act="share">🔗 分享</button><button type="button" data-act="line">💬 傳到 LINE</button></div>' +
+      sunRow(sp, m) +
       (c.wx.length ? '<div class="wxrow">' + wxChips(c) + '</div>' : '') +
       yearStrip(sp) +
       (h.length ? '<ul class="hl">' + h.map(function(x){ return '<li>' + x[1] + ' ' + esc(x[2]) + '</li>'; }).join('') + '</ul>' : '') +
@@ -109,8 +130,9 @@ function render(opts){
       if (g !== last){ html += '<div class="lgrp">' + g + '</div>'; last = g; }
       html += spotCard(p);
     });
-    list.innerHTML = html;
+    list.innerHTML = html || '<p style="font-size:13px;color:var(--mute);padding:4px">這個地區沒有這種型態的營地。</p>';
   }
+  renderTypes();
   if (window.CampScene && CampScene.ready){
     CampScene.setMonth(m); CampScene.selectSpot(st.spot); CampScene.setLayer(st.layer); CampScene.setNight(st.night);
     CampScene.setHorizon(sky[1].map(function(v){ return v / 255; }));
@@ -125,8 +147,34 @@ function render(opts){
 
 /* ---------- 動作 ---------- */
 function setMonth(m){ st.month = ((m - 1) % 12 + 12) % 12 + 1; render(); }
-function selectSpot(id){ if (id && innerWidth <= 760 && $('panel').classList.contains('min')) setSheet(false); st.spot = id || null; if (st.spot) st.region = CM.spotById[st.spot].r; fillSelectors(); render({fly:true}); }
-function selectRegion(r){ st.region = r; st.spot = null; fillSelectors(); render({fly:true}); }
+/* ---------- 日出日落、裝備清單、分享 ---------- */
+function sunRow(sp, m){
+  var su = CM.sun(sp, m);
+  return '<div class="sunrow">🌅 日出約 <b>' + su.rise + '</b>・🌇 日落約 <b>' + su.set + '</b>・白天約 ' + su.dayH + ' 小時<br>⛺ 建議 <b>' + su.pitch + '</b> 前抵達搭好帳，約 ' + su.dark + ' 天就全黑（山谷會更早）</div>';
+}
+var CK_KEY = 'taiwanCampChecklist';
+function ckCount(){ var all = $('ckBody').querySelectorAll('input'); $('ckAll').textContent = all.length; $('ckDone').textContent = [].filter.call(all, function(i){ return i.checked; }).length; }
+function openCheck(keep){
+  var sp = st.spot ? CM.spotById[st.spot] : null; if (!sp) return;
+  var c = CM.climate(sp, st.month), ck = lsGet(CK_KEY, {});
+  $('ckWhere').innerHTML = '<b style="font-size:15px;color:var(--ink)">' + esc(sp.name) + '</b>・' + st.month + '月・夜晚約 ' + deg(c.tn) + '、睡袋舒適 ' + CM.bagTemp(c.tn) + '°C 以下';
+  $('ckBody').innerHTML = CM.checklist(sp, c).map(function(g){
+    return '<section class="ckgrp' + (g.hot ? ' hot' : '') + '"><h3>' + esc(g.g) + '</h3><div class="ckcols">' + g.items.map(function(x){
+      var on = !!ck[x]; return '<label class="' + (on ? 'done' : '') + '"><input type="checkbox" data-k="' + esc(x) + '"' + (on ? ' checked' : '') + '><span>' + esc(x) + '</span></label>';
+    }).join('') + '</div></section>';
+  }).join('');
+  ckCount();
+  if (keep !== true) openModal('check');
+}
+function share(){
+  var u = shareUrl(), sp = st.spot ? CM.spotById[st.spot] : null, title = (sp ? sp.name + '・' : '') + st.month + '月露營｜台灣露營地圖';
+  if (navigator.share && matchMedia('(pointer:coarse)').matches){ navigator.share({title:title, url:u}).catch(function(){}); return; }
+  var done = function(){ toast('已複製連結，貼給朋友就能看到同一個營地與月份'); };
+  var fallback = function(){ var t = document.createElement('textarea'); t.value = u; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); done(); } catch (e){ toast(u); } t.remove(); };
+  if (navigator.clipboard) navigator.clipboard.writeText(u).then(done, fallback); else fallback();
+}
+function selectSpot(id){ if (id && innerWidth <= 760 && $('panel').classList.contains('min')) setSheet(false); st.spot = id || null; if (st.spot){ st.region = CM.spotById[st.spot].r; if (st.type !== 'all' && CM.spotById[st.spot].type !== st.type) st.type = 'all'; } fillSelectors(); render({fly:true}); }
+function selectRegion(r){ st.region = r; st.spot = null; st.type = 'all'; fillSelectors(); render({fly:true}); }
 function setNight(on){ st.night = !!on; render(); }
 function setLayer(on){ st.layer = !!on; render(); }
 
@@ -174,9 +222,16 @@ function bind(){
   $('selSpot').addEventListener('change', function(){ if (this.value) selectSpot(this.value); else selectRegion(st.region); });
   $('list').addEventListener('click', function(e){ var c = e.target.closest('.scard'); if (c) selectSpot(c.dataset.spot); });
   $('place').addEventListener('click', function(e){
+    var a = e.target.closest('[data-act]');
+    if (a){ if (a.dataset.act === 'check') openCheck(); else if (a.dataset.act === 'share') share(); else window.open('https://social-plugins.line.me/lineit/share?url=' + encodeURIComponent(shareUrl()), '_blank', 'noopener'); return; }
     var y = e.target.closest('[data-m]'); if (y){ stopPlay(); setMonth(+y.dataset.m); return; }
     var s = e.target.closest('[data-spot]'); if (s) selectSpot(s.dataset.spot);
   });
+  $('typeBar').addEventListener('click', function(e){ var b = e.target.closest('[data-type]'); if (b && !b.disabled){ st.type = b.dataset.type; fillSelectors(); render(); } });
+  $('ckBody').addEventListener('change', function(e){ var i = e.target; if (!i.dataset.k) return; var ck = lsGet(CK_KEY, {}); if (i.checked) ck[i.dataset.k] = 1; else delete ck[i.dataset.k]; lsSet(CK_KEY, ck); i.parentNode.classList.toggle('done', i.checked); ckCount(); });
+  $('ckReset').addEventListener('click', function(){ lsSet(CK_KEY, {}); openCheck(true); });
+  $('ckPrint').addEventListener('click', function(){ document.body.classList.add('printing'); window.print(); });
+  addEventListener('afterprint', function(){ document.body.classList.remove('printing'); });
   $('btnAll').addEventListener('click', function(){ st.region = 'all'; st.spot = null; fillSelectors(); render({fly:true}); });
   $('btnAbout').addEventListener('click', function(){ openModal('about'); });
   ['btnEtq', 'btnEtq2', 'btnEtq3'].forEach(function(id){ $(id).addEventListener('click', function(){ if (id === 'btnEtq3') closeModal($('about')); openModal('etq'); }); });
@@ -232,5 +287,5 @@ CampScene.init({host:$('stage'), labels:$('labels'), reduce:reduceOn(), month:st
   $('loading').addEventListener('click', function(){ $('loading').classList.add('hide'); firstVisit(); }, {once:true});
 });
 
-window.__camp = {state:st, setMonth:setMonth, selectSpot:selectSpot, selectRegion:selectRegion, setNight:setNight, setLayer:setLayer, CM:CM, scene:CampScene};
+window.__camp = {state:st, openCheck:openCheck, shareUrl:shareUrl, setMonth:setMonth, selectSpot:selectSpot, selectRegion:selectRegion, setNight:setNight, setLayer:setLayer, CM:CM, scene:CampScene};
 })();
